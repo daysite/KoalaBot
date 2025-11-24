@@ -13,7 +13,7 @@ async function makeFkontak() {
     const thumb2 = Buffer.from(await res.arrayBuffer())
     return {
       key: { participants: '0@s.whatsapp.net', remoteJid: 'status@broadcast', fromMe: false, id: 'Halo' },
-      message: { locationMessage: { name: '> *⏳️ Actualización Navideña ❄️*', jpegThumbnail: thumb2 } },
+      message: { locationMessage: { name: '*⏳️ Actualización Navideña ❄️*', jpegThumbnail: thumb2 } },
       participant: '0@s.whatsapp.net'
     }
   } catch {
