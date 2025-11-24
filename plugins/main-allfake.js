@@ -18,7 +18,6 @@ global.año = d.toLocaleDateString('es', {year: 'numeric'})
 global.tiempo = d.toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true})
 
 var canal = 'https://whatsapp.com/channel/0029VbBBXTr5fM5flFaxsO06'  
-// var comunidad = 'https://chat.whatsapp.com/BXxWuamOOE4K9eKC623FIO'
 var git = 'https://github.com/leoxito'
 var github = 'https://github.com/leoxito/Itsuki-NakanoV2'
 var correo = 'xzzysultra@gmail.com'
