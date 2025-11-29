@@ -72,6 +72,128 @@ if (!global.lidResolver) {
     };
 }
 
+// Función para resolver LIDs
+async function resolveLidToRealJid(lidJid, groupChatId, conn, maxRetries = 3) {
+    if (!lidJid.endsWith('@lid') || !groupChatId?.endsWith('@g.us')) {
+        return lidJid.includes('@') ? lidJid : `${lidJid}@s.whatsapp.net`;
+    }
+
+    const lidKey = lidJid.split('@')[0];
+    const cached = global.lidResolver.getUserInfo(lidKey);
+    if (cached && cached.jid && !cached.jid.endsWith('@lid')) {
+        return cached.jid;
+    }
+
+    let attempts = 0;
+    while (attempts < maxRetries) {
+        try {
+            const metadata = await conn.groupMetadata(groupChatId);
+            if (!metadata?.participants) {
+                throw new Error('No se pudieron obtener los participantes del grupo');
+            }
+
+            // Buscar en los participantes del grupo
+            for (const participant of metadata.participants) {
+                if (!participant?.id) continue;
+
+                try {
+                    // Verificar si este participante tiene el LID que buscamos
+                    const contactDetails = await conn.onWhatsApp(participant.id);
+                    if (!contactDetails?.[0]?.lid) continue;
+
+                    const participantLid = contactDetails[0].lid;
+                    const participantLidKey = participantLid.split('@')[0];
+
+                    if (participantLidKey === lidKey) {
+                        // Encontramos la coincidencia
+                        global.lidResolver.setUserInfo(lidKey, {
+                            jid: participant.id,
+                            name: participant.name || participant.notify || '',
+                            found: true
+                        });
+                        return participant.id;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            // Si llegamos aquí, no encontramos el LID en el grupo
+            global.lidResolver.setUserInfo(lidKey, {
+                jid: lidJid,
+                notFound: true,
+                error: 'Usuario no encontrado en el grupo'
+            });
+            return lidJid;
+
+        } catch (error) {
+            attempts++;
+            if (attempts >= maxRetries) {
+                console.error(`Error resolviendo LID ${lidJid} después de ${maxRetries} intentos:`, error);
+                global.lidResolver.setUserInfo(lidKey, {
+                    jid: lidJid,
+                    error: error.message
+                });
+                return lidJid;
+            }
+            await delay(1000 * attempts); // Espera incremental
+        }
+    }
+
+    return lidJid;
+}
+
+// Función para procesar menciones en tiempo real
+async function processMentions(m, conn) {
+    try {
+        // Procesar menciones del mensaje antes de que se ejecuten los comandos
+        const rawMentionList = Array.isArray(m.message?.extendedTextMessage?.contextInfo?.mentionedJid) ? 
+            m.message.extendedTextMessage.contextInfo.mentionedJid : 
+            (Array.isArray(m.mentionedJid) ? m.mentionedJid : []);
+
+        if (rawMentionList.length === 0) {
+            m._mentionedJidResolved = [];
+            return;
+        }
+
+        const hasLids = rawMentionList.some(j => j && j.endsWith('@lid'));
+        
+        if (!hasLids) {
+            m._mentionedJidResolved = rawMentionList.map(j => normalizeJid(j)).filter(j => j);
+            return;
+        }
+
+        // Resolver LIDs en tiempo real
+        const resolved = [];
+        for (const jid of rawMentionList) {
+            if (!jid) continue;
+            
+            if (jid.endsWith('@lid') && m.isGroup) {
+                try {
+                    const realJid = await resolveLidToRealJid(jid, m.chat, conn, 2);
+                    resolved.push(realJid);
+                } catch (error) {
+                    console.error(`Error resolviendo LID ${jid}:`, error);
+                    resolved.push(jid);
+                }
+            } else {
+                resolved.push(normalizeJid(jid));
+            }
+        }
+
+        m._mentionedJidResolved = resolved.filter(j => j);
+
+        // Actualizar el contexto del mensaje para que los comandos usen los JIDs correctos
+        if (m.message?.extendedTextMessage?.contextInfo) {
+            m.message.extendedTextMessage.contextInfo.mentionedJid = m._mentionedJidResolved;
+        }
+
+    } catch (error) {
+        console.error('Error en processMentions:', error);
+        m._mentionedJidResolved = [];
+    }
+}
+
 function pickOwners() {
   const arr = Array.isArray(global.owner) ? global.owner : []
   const flat = []
@@ -173,77 +295,6 @@ function parseUserTargets(input, options = {}) {
     }
 }
 
-// SISTEMA DE RESOLUCIÓN LIDs MEJORADO
-async function resolveLidToRealJid(lidJid, groupChatId, conn, maxRetries = 3) {
-    if (!lidJid.endsWith('@lid') || !groupChatId?.endsWith('@g.us')) {
-        return lidJid.includes('@') ? lidJid : `${lidJid}@s.whatsapp.net`;
-    }
-
-    const lidKey = lidJid.split('@')[0];
-    const cached = global.lidResolver.getUserInfo(lidKey);
-    if (cached && cached.jid && !cached.jid.endsWith('@lid')) {
-        return cached.jid;
-    }
-
-    let attempts = 0;
-    while (attempts < maxRetries) {
-        try {
-            const metadata = await conn.groupMetadata(groupChatId);
-            if (!metadata?.participants) {
-                throw new Error('No se pudieron obtener los participantes del grupo');
-            }
-
-            // Buscar en los participantes del grupo
-            for (const participant of metadata.participants) {
-                if (!participant?.id) continue;
-                
-                try {
-                    // Verificar si este participante tiene el LID que buscamos
-                    const contactDetails = await conn.onWhatsApp(participant.id);
-                    if (!contactDetails?.[0]?.lid) continue;
-                    
-                    const participantLid = contactDetails[0].lid;
-                    const participantLidKey = participantLid.split('@')[0];
-                    
-                    if (participantLidKey === lidKey) {
-                        // Encontramos la coincidencia
-                        global.lidResolver.setUserInfo(lidKey, {
-                            jid: participant.id,
-                            name: participant.name || participant.notify || '',
-                            found: true
-                        });
-                        return participant.id;
-                    }
-                } catch (e) {
-                    continue;
-                }
-            }
-
-            // Si llegamos aquí, no encontramos el LID en el grupo
-            global.lidResolver.setUserInfo(lidKey, {
-                jid: lidJid,
-                notFound: true,
-                error: 'Usuario no encontrado en el grupo'
-            });
-            return lidJid;
-
-        } catch (error) {
-            attempts++;
-            if (attempts >= maxRetries) {
-                console.error(`Error resolviendo LID ${lidJid} después de ${maxRetries} intentos:`, error);
-                global.lidResolver.setUserInfo(lidKey, {
-                    jid: lidJid,
-                    error: error.message
-                });
-                return lidJid;
-            }
-            await delay(1000 * attempts); // Espera incremental
-        }
-    }
-    
-    return lidJid;
-}
-
 // SISTEMA DE PRIMARY BOT
 async function handlePrimaryBotSystem(m, conn) {
     if (!m.isGroup) return false;
@@ -284,7 +335,7 @@ export async function handler(chatUpdate) {
   if (!chatUpdate) return
   this.__waCache = this.__waCache || new Map()
   this._groupCache = this._groupCache || {}
-  
+
   // Inicialización de métodos de simple.js si no existen
   if (!this.parseMention) {
       this.parseMention = function(text = "") {
@@ -357,7 +408,12 @@ export async function handler(chatUpdate) {
 
   try {
     m = smsg(this, m) || m
-    if (!m) return
+    if (!m) {
+      return
+    }
+
+    // PROCESAR MENCIONES INMEDIATAMENTE
+    await processMentions(m, this);
 
     // SISTEMA PRIMARY BOT
     const shouldIgnore = await handlePrimaryBotSystem(m, this);
@@ -446,61 +502,6 @@ export async function handler(chatUpdate) {
       const wid = participant.jid || rawId
       return { id: rawId, wid, widNum: normalizeCore(wid), admin: participant.admin ? 'admin' : null, isAdmin: !!participant.admin }
     })
-
-    // SISTEMA DE RESOLUCIÓN DE MENCIONES MEJORADO
-    const resolveMentionLids = async () => {
-      try {
-        const rawMentionList = Array.isArray(m.message?.extendedTextMessage?.contextInfo?.mentionedJid) ? 
-            m.message.extendedTextMessage.contextInfo.mentionedJid : 
-            (Array.isArray(m.mentionedJid) ? m.mentionedJid : []);
-        
-        if (rawMentionList.length === 0) {
-          m._mentionedJidResolved = [];
-          return;
-        }
-
-        const hasLids = rawMentionList.some(j => j && j.endsWith('@lid'));
-        
-        if (!hasLids) {
-          // Si no hay LIDs, simplemente normalizar los JIDs
-          m._mentionedJidResolved = rawMentionList.map(j => normalizeJid(j)).filter(j => j);
-          return;
-        }
-
-        // Resolver LIDs
-        const resolved = [];
-        for (const jid of rawMentionList) {
-          if (!jid) continue;
-          
-          if (jid.endsWith('@lid')) {
-            // Resolver LID
-            try {
-              const realJid = await resolveLidToRealJid(jid, m.chat, this, 2);
-              resolved.push(realJid);
-            } catch (error) {
-              console.error(`Error resolviendo LID ${jid}:`, error);
-              resolved.push(jid); // Mantener el LID original si falla
-            }
-          } else {
-            // JID normal
-            resolved.push(normalizeJid(jid));
-          }
-        }
-
-        m._mentionedJidResolved = resolved.filter(j => j);
-
-        // Actualizar el contexto del mensaje si es necesario
-        if (m.message?.extendedTextMessage?.contextInfo) {
-          m.message.extendedTextMessage.contextInfo.mentionedJid = m._mentionedJidResolved;
-        }
-
-      } catch (error) {
-        console.error('Error en resolveMentionLids:', error);
-        m._mentionedJidResolved = [];
-      }
-    };
-
-    await resolveMentionLids();
 
     const nameOf = async (jid) => {
       let n = ''
@@ -701,7 +702,7 @@ export async function handler(chatUpdate) {
         if (xp > 200) m.reply('chirrido -_-')
         else m.exp += xp
         if (plugin.limit && global.db.data.users[m.sender].limit < plugin.limit * 1) { this.reply(m.chat, `Se agotaron tus *Dolares 💲*`, m); continue }
-        
+
         let extra = { 
             match, 
             usedPrefix, 
@@ -735,7 +736,7 @@ export async function handler(chatUpdate) {
             copyNForward: this.copyNForward?.bind(this),
             downloadM: this.downloadM?.bind(this)
         }
-        
+
         let didPresence = false
         try {
           const botIdKey = this.user?.jid || (this.user?.id ? this.decodeJid(this.user.id) : 'bot')
