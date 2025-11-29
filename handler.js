@@ -6,12 +6,30 @@ import fs, { unwatchFile, watchFile } from "fs"
 import chalk from "chalk"
 import fetch from "node-fetch"
 import ws from "ws"
+
+// SISTEMA GLOBAL FILENAME - INICIO
+if (typeof global.__filename !== 'function') {
+  global.__filename = (url, relative = false) => {
+    const filename = fileURLToPath(url);
+    return relative ? path.relative(process.cwd(), filename) : filename;
+  };
+}
+
+if (typeof global.__dirname !== 'function') {
+  global.__dirname = (url, relative = false) => {
+    const dirname = path.dirname(fileURLToPath(url));
+    return relative ? path.relative(process.cwd(), dirname) : dirname;
+  };
+}
+// SISTEMA GLOBAL FILENAME - FIN
+
 const { proto } = (await import("@whiskeysockets/baileys")).default
 const isNumber = x => typeof x === "number" && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
 clearTimeout(this)
 resolve()
 }, ms))
+
 export async function handler(chatUpdate) {
 this.msgqueque = this.msgqueque || []
 this.uptime = this.uptime || Date.now()
@@ -154,6 +172,10 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 let usedPrefix
+
+// USO DE GLOBAL.__DIRNAME MEJORADO
+const ___dirname = global.__dirname(import.meta.url, false) || path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
+
 const groupMetadata = m.isGroup ? { ...(conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((conn.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) === m.sender) : {}) || {}
@@ -161,12 +183,15 @@ const botGroup = (m.isGroup ? participants.find((u) => conn.decodeJid(u.jid) == 
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
-const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins")
+
 for (const name in global.plugins) {
 const plugin = global.plugins[name]
 if (!plugin) continue
 if (plugin.disabled) continue
-const __filename = join(___dirname, name)
+
+// USO DE GLOBAL.__FILENAME MEJORADO
+const __filename = global.__filename(import.meta.url, false) || join(___dirname, name)
+
 if (typeof plugin.all === "function") {
 try {
 await plugin.all.call(this, m, {
@@ -382,12 +407,14 @@ const msg = {
     group: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ s᥆ᥣ᥆ sᥱ ⍴ᥙᥱძᥱ ᥙsᥲr ᥱᥒ grᥙ⍴᥆s.\`*',
     private: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ s᥆ᥣ᥆ sᥱ ⍴ᥙᥱძᥱ ᥙsᥲr ᥲᥣ ᥴһᥲ𝗍 ⍴rі᥎ᥲძ᥆ ძᥱᥣ ᑲ᥆𝗍.\`*',
     admin: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ s᥆ᥣ᥆ ᥱs ⍴ᥲrᥲ ᥲძmіᥒs ძᥱᥣ grᥙ⍴᥆.\`*',
-    botAdmin: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ⍴ᥲrᥲ ⍴᥆ძᥱr ᥙsᥲr ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ ᥱs ᥒᥱᥴᥱsᥲrі᥆ 𝗊ᥙᥱ ᥡ᥆ sᥱᥲ ᥲძmіᥒ.\`*',
+    botAdmin: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ⍴ᥲrᥲ ⍴᥆ძᥱr ᥙsᥲr ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ ᥱs ᥒᥱᥴᥱsᥲrі᥆ 𝗊ᥙᥱ ᥡ᥆ sᥱᥱ ᥲძmіᥒ.\`*',
     unreg: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ᥒᥱᥴᥱsі𝗍ᥲs ᥱs𝗍ᥲr rᥱgіs𝗍rᥲძ᥆(ᥲ) ⍴ᥲrᥲ ᥙsᥲr ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆, ᥱsᥴrіᑲᥱ #rᥱg ⍴ᥲrᥲ rᥱgіs𝗍rᥲr𝗍ᥱ.\`*',
     restrict: '*\`˙˚ʚ₍ ᐢ. ̫ .ᐢ ₎ɞ˚ ᥴ᥆mᥲᥒძ᥆ rᥱs𝗍rіᥒgіძ᥆ ⍴᥆r ძᥱᥴіsі᥆ᥒ ძᥱᥣ ⍴r᥆⍴іᥱ𝗍ᥲrі᥆ ძᥱᥣ ᑲ᥆𝗍.\`*'
   }[type];
 if (msg) return conn.reply(m.chat, msg, m, rcanal).then(_ => m.react('✖️'))
 }
+
+// USO FINAL DE GLOBAL.__FILENAME PARA WATCHFILE
 let file = global.__filename(import.meta.url, true)
 watchFile(file, async () => {
 unwatchFile(file)
