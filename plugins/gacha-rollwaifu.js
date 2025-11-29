@@ -50,6 +50,7 @@ let handler = async (m, { conn }) => {
             ? '🔴 Ya reclamado' 
             : '🟢 Disponible'
 
+        // FORMATO CORREGIDO - El claim busca "ID: *id*"
         const message = `> ⓘ \`Nombre:\` *${randomCharacter.name}*\n> ⓘ \`Género:\` *${randomCharacter.gender}*\n> ⓘ \`Valor:\` *${randomCharacter.value}*\n> ⓘ \`Estado:\` *${statusMessage}*\n> ⓘ \`Fuente:\` *${randomCharacter.source}*\n> ⓘ \`ID:\` *${randomCharacter.id}*`
 
         const mentions = userHarem ? [userHarem.userId] : []
