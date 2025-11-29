@@ -15,10 +15,13 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const video = search.videos[0]
 
-    // Mostrar información del video primero
+    // Mostrar información del video con imagen
     const info = `> ⓘ \`Título:\` *${video.title}*\n> ⓘ \`Autor:\` *${video.author.name}*\n> ⓘ \`Duración:\` *${video.timestamp}*\n> ⓘ \`Vistas:\` *${video.views.toLocaleString()}*`
 
-    await conn.reply(m.chat, info, m)
+    await conn.sendMessage(m.chat, {
+      image: { url: video.thumbnail },
+      caption: info
+    }, { quoted: m })
 
     if (command === 'play11') {
       // Descargar video
