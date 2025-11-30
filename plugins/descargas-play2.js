@@ -36,45 +36,46 @@ let handler = async (m, { conn, text, usedPrefix }) => {
   const ctxOk = (global.rcanalr || {})    
 
   if (!text) {    
-    return conn.reply(m.chat, `    
-🌸📹 Itsuki Nakano - Descargar Video    
-
-📝 Uso:    
-• ${usedPrefix}play2 <nombre de la canción>    
-
-💡 Ejemplo:    
-• ${usedPrefix}play2 spy x family opening    
-
-🎯 Formato:    
-🎥 Video MP4 de alta calidad    
-
-🍱 ¡Disfruta tus videos con Itsuki Nakano! 🌸    
-    `.trim(), m, ctxWarn)    
+    await m.react('❓')
+    return conn.reply(m.chat, 
+      `> \`📹 DESCARGAR VIDEO\` 🍙\n\n` +
+      `> \`📝 Uso:\`\n` +
+      `> \`• ${usedPrefix}play2 <nombre de la canción>\`\n\n` +
+      `> \`💡 Ejemplo:\`\n` +
+      `> \`• ${usedPrefix}play2 spy x family opening\`\n\n` +
+      `> \`🎯 Formato:\`\n` +
+      `> \`🎥 Video MP4 de alta calidad\`\n\n` +
+      `> \`📚 "¡Disfruta tus videos con Itsuki Nakano!"\` ✨`,
+      m, ctxWarn
+    )    
   }    
 
   try {    
-    await conn.reply(m.chat, '*🔎🎬 Itsuki está buscando tu video*', m, ctxOk)    
+    await m.react('🔍')
+    await conn.reply(m.chat, '> `🔎🎬 Itsuki está buscando tu video` 🍙', m, ctxOk)    
 
     const searchResults = await yts(text)    
-    if (!searchResults.videos.length) throw new Error('No se encontraron resultados')    
+    if (!searchResults.videos.length) {
+      await m.react('❌')
+      throw new Error('No se encontraron resultados')    
+    }
 
     const video = searchResults.videos[0]    
     const { url, title, fuente } = await ytdl(video.url)    
 
-    const caption = `    
-🌸✨ ¡Itsuki Nakano trae tu video! ✨🌸    
-💖 *Título:* ${title}    
-⏱ *Duración:* ${video.timestamp}    
-👤 *Autor:* ${video.author.name}    
-🔗 *URL:* ${video.url}    
-
-🌐 *API:* ${fuente}    
-🌷 ¡Disfruta y no olvides sonreír! 🌷    
-> 🍱 Gracias por elegirme para tus descargas     
-`.trim()    
+    const caption = 
+      `> \`🌸✨ VIDEO ENCONTRADO\` 🍙\n\n` +
+      `> \`💖 Título:\` ${title}\n` +
+      `> \`🕑 Duración:\` ${video.timestamp}\n` +
+      `> \`👤 Autor:\` ${video.author.name}\n` +
+      `> \`🔗 URL:\` ${video.url}\n` +
+      `> \`🌐 API:\` ${fuente}\n\n` +
+      `> \`📚 "¡Disfruta y no olvides sonreír!"\` ✨\n` +
+      `> \`🍱 "Gracias por elegirme para tus descargas"\` 🌸`
 
     const buffer = await fetch(url).then(res => res.buffer())    
 
+    await m.react('✅')
     await conn.sendMessage(    
       m.chat,    
       {    
@@ -88,7 +89,13 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 
   } catch (e) {    
     console.error('❌ Error en play2:', e)    
-    await conn.reply(m.chat, `❌ Error: ${e.message}`, m, ctxErr)    
+    await m.react('❌')
+    await conn.reply(m.chat, 
+      `> \`❌ ERROR EN DESCARGA\` 🍙\n\n` +
+      `> \`📚 Problema:\` ${e.message}\n\n` +
+      `> \`🍙 "Lo siento, no pude encontrar tu video"\` ✨`,
+      m, ctxErr
+    )    
   }    
 }    
 
