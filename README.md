@@ -9,10 +9,10 @@
 
 <br>
 
-[![Version](https://img.shields.io/badge/Version-6.4.1-FF69B4.svg?style=for-the-badge&logo=star)]()
+[![Version](https://img.shields.io/badge/Version-7.5.2-FF69B4.svg?style=for-the-badge&logo=star)]()
 [![Baileys](https://img.shields.io/badge/Baileys-Multi--Device-00BFFF.svg?style=for-the-badge&logo=whatsapp)]()
 [![Plugins](https://img.shields.io/badge/Plugins-1000+-00FF7F.svg?style=for-the-badge&logo=rocket)]()
 [![Speed](https://img.shields.io/badge/Speed-⚡Ultra_Fast-FFD700.svg?style=for-the-badge&logo=flash)]()
-[![Node.js](https://img.shields.io/badge/Node.js-18+-32CD32.svg?style=for-the-badge&logo=node.js)]()
+[![Node.js](https://img.shields.io/badge/Node.js-21+-32CD32.svg?style=for-the-badge&logo=node.js)]()
 
 </div>
