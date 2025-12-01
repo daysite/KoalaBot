@@ -8,15 +8,15 @@ let handler = async (m, { conn, usedPrefix, command, isAdmin, isBotAdmin }) => {
     if (m.quoted) {
         user = m.quoted.sender;
     } else {
-        return conn.reply(m.chat, '> `❌ USUARIO NO ESPECIFICADO`\n\n> `📝 Responde al mensaje del usuario que quieres mutear.`', m);
+        return conn.reply(m.chat, '> ❌️ `USUARIO NO ESPECIFICADO`\n\n> `📝 Responde al mensaje del usuario que quieres mutear.`', m);
     }
 
     if (command === "mute") {
         mutedUsers.add(user);
-        conn.reply(m.chat, '> `✅ USUARIO MUTEADO`\n\n> `👤 Usuario:` @' + user.split('@')[0], m, { mentions: [user] });
+        conn.reply(m.chat, '> ✅️ `USUARIO MUTEADO`\n\n> 👤 `Usuario:` @' + user.split('@')[0], m, { mentions: [user] });
     } else if (command === "unmute") {
         mutedUsers.delete(user);
-        conn.reply(m.chat, '> `✅ USUARIO DESMUTEADO`\n\n> `👤 Usuario:` @' + user.split('@')[0], m, { mentions: [user] });
+        conn.reply(m.chat, '> ✅️ `USUARIO DESMUTEADO`\n\n> 👤 `Usuario:` @' + user.split('@')[0], m, { mentions: [user] });
     }
 };
 
