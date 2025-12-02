@@ -5,14 +5,11 @@ let handler = async (m, { conn, usedPrefix }) => {
     let info = `╭─「 📊 *CONFIGURACIÓN DEL GRUPO* 📊 」
 │ 
 │ 🛡️ *Seguridad:*
-│ ├ RootOwner: ${chat.rootowner ? '🟢 ACTIVADO' : '🔴 DESACTIVADO'}
 │ ├ AntiLink: ${chat.antiLink ? '🟢' : '🔴'}
 │ ├ AntiArabe: ${chat.antiArabe ? '🟢' : '🔴'}
-│ ├ ModoAdmin: ${chat.modoadmin ? '🟢' : '🔴'}
 │ 
 │ 🎉 *Bienvenidas:*
 │ ├ Welcome: ${chat.welcome ? '🟢' : '🔴'}
-│ ├ Detect: ${chat.detect ? '🟢' : '🔴'}
 │ 
 │ ⚙️ *Otras configs:*
 │ ├ NSFW: ${chat.nsfw ? '🟢' : '🔴'}
