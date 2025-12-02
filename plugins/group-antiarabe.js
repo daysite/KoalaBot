@@ -143,7 +143,7 @@ let handler = async (m, { conn, usedPrefix, command, isAdmin, isROwner }) => {
     }
 }
 
-handler.help = ['antiarabe [on/off/stats/lista/limpiar]']
+handler.help = ['antiarabe on/off']
 handler.tags = ['group']
 handler.command = /^(anti(arabe|árabe)|arabfilter)$/i
 handler.group = true
