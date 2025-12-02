@@ -25,16 +25,16 @@ let handler = async (m, { conn, text, args, usedPrefix }) => {
             
             await conn.sendMessage(m.chat, { 
                 image: { url: selectedImage.image_large_url }, 
-                caption: '> `📌 PINTEREST` 🎨\n\n' +
-                        '> `🎯 Tema:` *' + text + '*\n' +
-                        '> `📖 Título:` ' + (pinInfo.title || 'Sin título') + '\n' +
-                        '> `👤 Autor:` ' + (pinInfo.user || 'Información no disponible') + '\n' +
-                        '> `📋 Tablero:` ' + (pinInfo.board || 'Tablero no disponible') + '\n' +
-                        '> `🔗 Enlace:` _' + (pinInfo.link || '#') + '_\n\n' +
-                        '> `✨ Resultados de tu búsqueda`'
+                caption: '> *PINTEREST* 🎨\n\n' +
+                        '> `Tema:` *' + text + '*\n' +
+                        '> `Título:` ' + (pinInfo.title || 'Sin título') + '\n' +
+                        '> `Autor:` ' + (pinInfo.user || 'Información no disponible') + '\n' +
+                        '> `Tablero:` ' + (pinInfo.board || 'Tablero no disponible') + '\n' +
+                        '> `Enlace:` _' + (pinInfo.link || '#') + '_\n\n' +
+                        '> `Resultados de tu búsqueda`'
             }, { quoted: m })
             
-            await m.react('✔️')
+            await m.react('✅️')
         }
     } catch (e) {
         await m.react('✖️')
