@@ -14,7 +14,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
   }
 
   try {
-    await conn.sendMessage(m.chat, { react: { text: '🔍', key: m.key } })
+    await conn.sendMessage(m.chat, { react: { text: '🕑', key: m.key } })
 
     const search = await yts(text)
     if (!search.videos.length) throw new Error('No encontré resultados')
@@ -33,7 +33,7 @@ let handler = async (m, { conn, text, usedPrefix }) => {
     }
 
     const fuentes = [
-      { api: 'Adonix', endpoint: `https://api-adonix.ultraplus.click/download/ytmp3?apikey=${global.apikey}&url=${encodeURIComponent(url)}`, extractor: res => res?.data?.url },
+      { api: 'Adonix', endpoint: `https://api-adonix.ultraplus.click/download/ytaudio?apikey=${global.apikey}&url=${encodeURIComponent(url)}`, extractor: res => res?.data?.url },
       { api: 'MayAPI', endpoint: `https://mayapi.ooguy.com/ytdl?url=${encodeURIComponent(url)}&type=mp3&apikey=${global.APIKeys['https://mayapi.ooguy.com']}`, extractor: res => res.result.url }
     ]
 
