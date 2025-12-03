@@ -24,7 +24,7 @@ const globalPrefixes = [
 // Función para detectar prefijo con soporte para emojis
 const detectPrefix = (text, customPrefix = null) => {
   if (!text || typeof text !== 'string') return null;
-  
+
   // Primero verificar prefijos personalizados del chat
   if (customPrefix) {
     // Si es array (lista de prefijos del chat)
@@ -48,7 +48,7 @@ const detectPrefix = (text, customPrefix = null) => {
       };
     }
   }
-  
+
   // Si no hay prefijo personalizado o no coincide, usar prefijos globales
   for (const prefix of globalPrefixes) {
     if (text.startsWith(prefix)) {
@@ -59,7 +59,7 @@ const detectPrefix = (text, customPrefix = null) => {
       };
     }
   }
-  
+
   return null;
 };
 
@@ -517,24 +517,24 @@ export async function handler(chatUpdate) {
             // Obtener prefijos para este chat
             const chatPrefixes = chat?.prefixes || []
             const chatPrefix = chat?.prefix || null
-            
+
             // Crear lista combinada de prefijos: primero los del chat, luego los globales
             let allPrefixes = []
             if (chatPrefixes.length > 0) {
                 allPrefixes = [...chatPrefixes]
             }
-            
+
             // Si el chat tiene un prefijo específico, agregarlo primero
             if (chatPrefix) {
                 allPrefixes = [chatPrefix, ...allPrefixes]
             }
-            
+
             // Agregar prefijos globales
             allPrefixes = [...allPrefixes, ...globalPrefixes]
-            
+
             // Remover duplicados
             allPrefixes = [...new Set(allPrefixes)]
-            
+
             // Detectar prefijo
             const prefixMatch = detectPrefix(m.text, allPrefixes)
 
@@ -636,45 +636,82 @@ export async function handler(chatUpdate) {
 
                 if (adminMode && !isOwner && m.isGroup && !isAdmin && wa) return
 
+                // CORRECCIÓN: Solo validar permisos si el plugin los especifica
                 if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) {
-                    fail("owner", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("rowner", m, this, usedPrefix)
+                    } else {
+                        global.dfail("rowner", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 if (plugin.rowner && !isROwner) {
-                    fail("rowner", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("rowner", m, this, usedPrefix)
+                    } else {
+                        global.dfail("rowner", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 if (plugin.owner && !isOwner) {
-                    fail("owner", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("owner", m, this, usedPrefix)
+                    } else {
+                        global.dfail("owner", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 if (plugin.premium && !isPrems) {
-                    fail("premium", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("premium", m, this, usedPrefix)
+                    } else {
+                        global.dfail("premium", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 // SISTEMA DE REGISTRO - VALIDACIÓN
                 if (plugin.register == true && user.registered == false) {
-                    fail("unreg", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("unreg", m, this, usedPrefix)
+                    } else {
+                        global.dfail("unreg", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 if (plugin.group && !m.isGroup) {
-                    fail("group", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("group", m, this, usedPrefix)
+                    } else {
+                        global.dfail("group", m, this, usedPrefix)
+                    }
                     continue
                 } else if (plugin.botAdmin && !isBotAdmin) {
-                    fail("botAdmin", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("botAdmin", m, this, usedPrefix)
+                    } else {
+                        global.dfail("botAdmin", m, this, usedPrefix)
+                    }
                     continue
                 } else if (plugin.admin && !isAdmin) {
-                    fail("admin", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("admin", m, this, usedPrefix)
+                    } else {
+                        global.dfail("admin", m, this, usedPrefix)
+                    }
                     continue
                 }
 
                 if (plugin.private && m.isGroup) {
-                    fail("private", m, this, usedPrefix)
+                    if (typeof fail === "function") {
+                        fail("private", m, this, usedPrefix)
+                    } else {
+                        global.dfail("private", m, this, usedPrefix)
+                    }
                     continue
                 }
 
@@ -750,6 +787,7 @@ export async function handler(chatUpdate) {
     }
 }
 
+// FUNCIÓN DFALL CORREGIDA - SOLO MOSTRAR MENSAJE CUANDO REALMENTE FALLA UN PERMISO
 global.dfail = (type, m, conn, usedPrefix = '.') => {
     let user2 = m.pushName || 'Anónimo'
 
