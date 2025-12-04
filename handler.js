@@ -14,20 +14,16 @@ clearTimeout(this)
 resolve()
 }, ms))
 
-// === SISTEMA DE MULTI-PREFIJO MEJORADO ===
 const globalPrefixes = [
   '.', ',', '!', '#', '$', '%', '&', '*',
   '-', '_', '+', '=', '|', '\\', '/', '~',
   '>', '<', '^', '?', ':', ';'
-];
+]
 
-// Función para detectar prefijo
 const detectPrefix = (text, customPrefix = null) => {
-  if (!text || typeof text !== 'string') return null;
+  if (!text || typeof text !== 'string') return null
 
-  // Primero verificar prefijos personalizados del chat
   if (customPrefix) {
-    // Si es array (lista de prefijos del chat)
     if (Array.isArray(customPrefix)) {
       for (const prefix of customPrefix) {
         if (text.startsWith(prefix)) {
@@ -35,35 +31,32 @@ const detectPrefix = (text, customPrefix = null) => {
             match: prefix, 
             prefix: prefix, 
             type: 'custom'
-          };
+          }
         }
       }
     }
-    // Si es string (prefijo específico del chat)
     else if (typeof customPrefix === 'string' && text.startsWith(customPrefix)) {
       return { 
         match: customPrefix, 
         prefix: customPrefix, 
         type: 'custom'
-      };
+      }
     }
   }
 
-  // Si no hay prefijo personalizado o no coincide, usar prefijos globales
   for (const prefix of globalPrefixes) {
     if (text.startsWith(prefix)) {
       return { 
         match: prefix, 
         prefix: prefix, 
         type: 'global'
-      };
+      }
     }
   }
 
-  return null;
-};
+  return null
+}
 
-// === DEFINICIÓN DE CÓDIGOS DE PAÍSES ===
 const paisesCodigos = {
     'arabia': ['+966', '966'],
     'emiratos': ['+971', '971'],
@@ -108,7 +101,6 @@ const paisesCodigos = {
     'venezuela': ['+58', '58']
 }
 
-// Función para detectar el país por número
 function detectCountryByNumber(number) {
     const numStr = number.toString()
     for (const [country, codes] of Object.entries(paisesCodigos)) {
@@ -121,7 +113,6 @@ function detectCountryByNumber(number) {
     return 'local'
 }
 
-// Función para obtener nombre completo del país
 function getCountryName(code) {
     const countryNames = {
         'arabia': 'Arabia Saudita 🇸🇦',
@@ -170,7 +161,6 @@ function getCountryName(code) {
     return countryNames[code] || code
 }
 
-// Función para verificar si un usuario es admin
 async function isUserAdmin(conn, groupJid, userJid) {
     try {
         const metadata = await conn.groupMetadata(groupJid)
@@ -241,7 +231,7 @@ let chat = global.db.data.chats[m.chat]
 if (typeof chat !== "object") global.db.data.chats[m.chat] = {}
 if (chat) {
 if (!("isBanned" in chat)) chat.isBanned = false
-if (!("isMute" in chat)) chat.isMute = false;
+if (!("isMute" in chat)) chat.isMute = false
 if (!("welcome" in chat)) chat.welcome = false
 if (!("sWelcome" in chat)) chat.sWelcome = ""
 if (!("sBye" in chat)) chat.sBye = ""
@@ -250,10 +240,9 @@ if (!("primaryBot" in chat)) chat.primaryBot = null
 if (!("modoadmin" in chat)) chat.modoadmin = false
 if (!("antiLink" in chat)) chat.antiLink = true
 if (!("nsfw" in chat)) chat.nsfw = false
-if (!("economy" in chat)) chat.economy = true;
+if (!("economy" in chat)) chat.economy = true
 if (!("gacha" in chat)) chat.gacha = true
 
-// === SISTEMAS AGREGADOS ===
 if (!("antiArabe" in chat)) chat.antiArabe = true
 if (!("antiExtranjero" in chat)) chat.antiExtranjero = false
 if (!("paisesBloqueados" in chat)) chat.paisesBloqueados = []
@@ -276,7 +265,6 @@ nsfw: false,
 economy: true,
 gacha: true,
 
-// === SISTEMAS AGREGADOS ===
 antiArabe: true,
 antiExtranjero: false,
 paisesBloqueados: [],
@@ -307,10 +295,9 @@ user.name = nuevo
 }} catch {}
 const chat = global.db.data.chats[m.chat]
 const settings = global.db.data.settings[this.user.jid]  
-const isROwner = [...global.owner.map(([number]) => number)].map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender)
+const isROwner = [...global.owner.map((number) => number)].map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net").includes(m.sender)
 const isOwner = isROwner || m.fromMe
 
-// === SISTEMA ROOTOWNER - VERIFICACIÓN TEMPRANA ===
 if (chat?.rootowner && !isROwner) {
     return
 }
@@ -330,41 +317,38 @@ await delay(time)
 if (m.isBaileys) return
 m.exp += Math.ceil(Math.random() * 10)
 
-// === SISTEMA ANTI-ARABE Y BLOQUEO POR PAÍS ===
 try {
     if (m.message && m.key.remoteJid.endsWith('@g.us')) {
         const text = m.text || ''
         const sender = m.sender
         const userNumber = sender.split('@')[0]
 
-        // Detectar país del usuario
         const userCountry = detectCountryByNumber(userNumber)
         const countryName = getCountryName(userCountry)
 
-        // Sistema AntiArabe - EXPULSA números árabes
         if (chat.antiArabe) {
             const paisesArabes = [
-                '+966', '966', // Arabia Saudita
-                '+971', '971', // Emiratos Árabes Unidos
-                '+974', '974', // Qatar
-                '+965', '965', // Kuwait
-                '+973', '973', // Bahréin
-                '+968', '968', // Omán
-                '+20', '20',   // Egipto
-                '+962', '962', // Jordania
-                '+963', '963', // Siria
-                '+964', '964', // Irak
-                '+967', '967', // Yemen
-                '+970', '970', // Palestina
-                '+961', '961', // Líbano
-                '+218', '218', // Libia
-                '+212', '212', // Marruecos
-                '+216', '216', // Túnez
-                '+213', '213', // Argelia
-                '+222', '222', // Mauritania
-                '+253', '253', // Yibuti
-                '+252', '252', // Somalia
-                '+249', '249'  // Sudán
+                '+966', '966', 
+                '+971', '971', 
+                '+974', '974', 
+                '+965', '965', 
+                '+973', '973', 
+                '+968', '968', 
+                '+20', '20',   
+                '+962', '962', 
+                '+963', '963', 
+                '+964', '964', 
+                '+967', '967', 
+                '+970', '970', 
+                '+961', '961', 
+                '+218', '218', 
+                '+212', '212', 
+                '+216', '216', 
+                '+213', '213', 
+                '+222', '222', 
+                '+253', '253', 
+                '+252', '252', 
+                '+249', '249'  
             ]
 
             const esArabe = paisesArabes.some(code => userNumber.startsWith(code.replace('+', '')))
@@ -372,7 +356,6 @@ try {
             if (esArabe) {
                 const isUserAdm = await isUserAdmin(this, m.chat, sender)
                 if (!isUserAdm) {
-                    // Expulsar al usuario árabe
                     await this.groupParticipantsUpdate(m.chat, [sender], 'remove')
 
                     await this.sendMessage(m.chat, { 
@@ -403,9 +386,7 @@ try {
             }
         }
 
-        // Sistema Anti-Extranjero y Bloqueo por País
         if (chat.antiExtranjero || (chat.paisesBloqueados && chat.paisesBloqueados.length > 0)) {
-            // Verificar si el país está bloqueado
             const paisBloqueado = chat.paisesBloqueados.includes(userCountry)
 
             if (chat.antiExtranjero && userCountry !== 'local') {
@@ -437,7 +418,6 @@ try {
                 }
             }
 
-            // Bloqueo específico por país
             if (paisBloqueado) {
                 const isUserAdm = await isUserAdmin(this, m.chat, sender)
                 if (!isUserAdm) {
@@ -479,7 +459,6 @@ const botGroup = (m.isGroup ? participants.find((u) => this.decodeJid(u.jid) == 
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 
-// === SISTEMA ADMINMODE - VERIFICACIÓN ===
 if (chat?.adminmode && !isAdmin && !isROwner) {
     return
 }
@@ -510,12 +489,9 @@ if (plugin.tags && plugin.tags.includes("admin")) {
 continue
 }
 
-// === SISTEMA DE MULTI-PREFIJO MEJORADO ===
-// Obtener prefijos para este chat
 const chatPrefixes = chat?.prefixes || []
 const chatPrefix = chat?.prefix || null
 
-// Crear lista combinada de prefijos
 let allPrefixes = []
 if (chatPrefixes.length > 0) {
     allPrefixes = [...chatPrefixes]
@@ -525,32 +501,27 @@ if (chatPrefix) {
     allPrefixes = [chatPrefix, ...allPrefixes]
 }
 
-// Agregar prefijos globales
 allPrefixes = [...allPrefixes, ...globalPrefixes]
 
-// Remover duplicados
 allPrefixes = [...new Set(allPrefixes)]
 
-// Detectar prefijo usando el nuevo sistema
-const prefixMatch = detectPrefix(m.text, allPrefixes)
+const prefixMatch = detectPrefix(m.text || '', allPrefixes)
 
-// Mantener compatibilidad con el sistema antiguo
 let match
 if (prefixMatch) {
     match = [prefixMatch.prefix]
 } else {
-    // Sistema antiguo como fallback
-    const strRegex = (str) => str.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&")
+    const strRegex = (str) => String(str || '').replace(/[|\\{}()[\]^$+*?.]/g, "\\$&")
     const pluginPrefix = plugin.customPrefix || this.prefix || global.prefix
     match = (pluginPrefix instanceof RegExp ?
-    [[pluginPrefix.exec(m.text), pluginPrefix]] :
+    [[pluginPrefix.exec(m.text || ''), pluginPrefix]] :
     Array.isArray(pluginPrefix) ?
     pluginPrefix.map(prefix => {
     const regex = prefix instanceof RegExp ?
     prefix : new RegExp(strRegex(prefix))
-    return [regex.exec(m.text), regex]
+    return [regex.exec(m.text || ''), regex]
     }) : typeof pluginPrefix === "string" ?
-    [[new RegExp(strRegex(pluginPrefix)).exec(m.text), new RegExp(strRegex(pluginPrefix))]] :
+    [[new RegExp(strRegex(pluginPrefix)).exec(m.text || ''), new RegExp(strRegex(pluginPrefix))]] :
     [[[], new RegExp]]).find(prefix => prefix[1])
 }
 
@@ -582,7 +553,6 @@ if (typeof plugin !== "function") {
 continue
 }
 
-// Usar el prefijo detectado
 let usedPrefixTemp = ''
 if (prefixMatch && prefixMatch.prefix) {
     usedPrefixTemp = prefixMatch.prefix
@@ -592,7 +562,7 @@ if (prefixMatch && prefixMatch.prefix) {
 
 if (usedPrefixTemp) {
 usedPrefix = usedPrefixTemp
-const noPrefix = m.text.replace(usedPrefix, "")
+const noPrefix = (m.text || '').replace(usedPrefix, "")
 let [command, ...args] = noPrefix.trim().split(" ").filter(v => v)
 args = args || []
 let _args = noPrefix.trim().split(" ").slice(1)
@@ -642,7 +612,6 @@ return
 }}}
 if (!isOwners && !m.chat.endsWith('g.us') && !/code|p|ping|qr|estado|status|infobot|botinfo|report|reportar|invite|join|logout|suggest|help|menu/gim.test(m.text)) return
 
-// === SISTEMA MODODMIN ===
 const adminMode = chat.modoadmin || false
 const wa = plugin.botAdmin || plugin.admin || plugin.group || plugin || noPrefix || usedPrefix || m.text.slice(0, 1) === usedPrefix || plugin.command
 
@@ -748,11 +717,10 @@ global.dfail = (type, m, conn) => {
         botAdmin: '> `ⓘ ⍴ᥲrᥲ ⍴᥆ძᥱr ᥙsᥲr ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆ ᥱs ᥒᥱᥴᥱsᥲrі᥆ 𝗊ᥙᥱ ᥡ᥆ sᥱᥲ ᥲძmіᥒ.`',
         unreg: `> \`ⓘ ᥒᥱᥴᥱsі𝗍ᥲs ᥱs𝗍ᥲr rᥱgіs𝗍rᥲძ᥆(ᥲ) ⍴ᥲrᥲ ᥙsᥲr ᥱs𝗍ᥱ ᥴ᥆mᥲᥒძ᥆, ᥱsᥴrіᑲ᥆ #rᥱg ⍴ᥲrᥲ rᥱgіs𝗍rᥲr𝗍ᥱ.\``,
         restrict: '> `ⓘ ᥴ᥆mᥲᥒძ᥆ rᥱs𝗍rіᥒgіძ᥆ ⍴᥆r ძᥱᥴіsі᥆ᥒ ძᥱᥣ ⍴r᥆⍴іᥱ𝗍ᥲrі᥆ ძᥱᥣ ᑲ᥆𝗍.`'
-    }[type];
+    }[type]
 if (msg) return conn.reply(m.chat, msg, m, global.rcanal).then(_ => m.react('❌️'))
 }
 
-// Exportar funciones del sistema de prefijos
 global.detectPrefix = detectPrefix
 global.globalPrefixes = globalPrefixes
 
