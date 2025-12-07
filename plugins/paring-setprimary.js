@@ -25,3 +25,5 @@ handler.tags = ['serbot']
 handler.command = ['setprimary']
 handler.group = true
 handler.admin = true
+
+export default handler
