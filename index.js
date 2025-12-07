@@ -22,6 +22,12 @@ const __dirname = path.dirname(__filename)
 // DEFINIR _filename aquí para evitar el error
 global._filename = __filename
 
+// --- INICIO DE LA MODIFICACIÓN ESENCIAL ---
+// AÑADE ESTA LÍNEA AQUÍ
+// Inicializa global.conns como un array vacío para almacenar las conexiones de los sub-bots.
+global.conns = global.conns || [];
+// --- FIN DE LA MODIFICACIÓN ---
+
 global.prefixes = Array.isArray(config.prefix) ? [...config.prefix] : []
 global.owner = Array.isArray(config.owner) ? config.owner : []
 global.opts = global.opts && typeof global.opts === 'object' ? global.opts : {}
