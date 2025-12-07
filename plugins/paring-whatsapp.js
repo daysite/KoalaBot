@@ -2,7 +2,7 @@ import pkg from '@whiskeysockets/baileys'
 const { useMultiFileAuthState, fetchLatestBaileysVersion, Browsers, DisconnectReason, generateWAMessageFromContent, proto, prepareWAMessageMedia } = pkg
 import pino from "pino";
 // Asegúrate de que './lib/simple.js' existe y exporta makeWASocket, protoType, y serialize
-import { protoType, serialize, makeWASocket } from './lib/simple.js' 
+import { protoType, serialize, makeWASocket } from '../lib/simple.js' // ⚠️ Nota: La ruta a lib/simple.js debe ser '../lib/simple.js' si este archivo está en /plugins
 import path from 'path'
 import fs from 'fs'
 import chalk from 'chalk'
@@ -10,8 +10,8 @@ import chalk from 'chalk'
 // Importamos el handler principal para que los sub-bots puedan procesar mensajes
 let mainHandler
 try {
-  // 🟢 CORRECCIÓN DE RUTA: Apuntando al handler principal (asumiendo que está en la raíz)
-  ({ handler: mainHandler } = await import('./handler.js')) 
+  // 🟢 CORRECCIÓN DE RUTA: Apuntando al handler principal (ajustar si handler.js no está en la raíz)
+  ({ handler: mainHandler } = await import('../handler.js')) 
 } catch (e) {
   console.error('[SUBBOT] Error importando handler principal:', e.message || e)
 }
@@ -129,7 +129,7 @@ export const startSubBot = async (userName, conn, m) => {
 
       setTimeout(async () => {
         try {
-            const rawCode = await sock.requestPairingCode(userName)
+            const rawCode = await sock.requestPairingCode(number)
             await conn.sendMessage(m.chat, { react: { text: '✅️', key: m.key } })
 
             // --- 👑 TU CÓDIGO DE BOTONES Y DECORACIÓN (RESTORED) 👑 ---
