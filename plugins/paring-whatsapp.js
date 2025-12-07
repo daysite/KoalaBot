@@ -5,24 +5,24 @@ import { protoType, serialize, makeWASocket } from '../lib/simple.js'
 import path from 'path'
 import fs from 'fs'
 
-// --- CAMBIO CLAVE ---
-// Inicializamos global.conns en lugar de global.subbots
-if (!global.conns) global.conns = []
+// --- YEEH ---
+// Inicializamos global.subbots
+if (!global.subbots) global.subbots = []
 
 let handler = async (m, { conn, args, usedPrefix, command }) => {
   let userName = args[0] ? args[0] : m.sender.split("@")[0]
   const folder = path.join('Sessions/SubBot', userName)
 
-  // --- CAMBIO CLAVE ---
-  // Usamos global.conns para verificar el límite
-  if (global.conns.length >= 10) {
+  // --- VERSIÓN ORIGINAL ---
+  // Usamos global.subbots para verificar el límite
+  if (global.subbots.length >= 10) {
     await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
     return conn.reply(m.chat, '> [🌱] 𝙔𝙖 𝙉𝙤 𝙃𝙖𝙮 𝙈𝙖́𝙨 𝙀𝙨𝙥𝙖𝙘𝙞𝙤 𝙋𝙖𝙧𝙖 𝙃𝙖𝙘𝙚𝙧𝙩𝙚 𝙎𝙪𝙗-𝘽𝙤𝙩 𝙄𝙣𝙩𝙚𝙣𝙩𝙖𝙡𝙤 𝙉𝙪𝙚𝙫𝙖𝙢𝙚𝙣𝙩𝙚 𝙈𝙖́𝙨 𝙏𝙖𝙧𝙙𝙚...', m)
   }
 
-  // --- CAMBIO CLAVE ---
-  // Usamos global.conns para buscar una conexión existente
-  const existing = global.conns.find(c => c.id === userName && c.connection === 'open')
+  // --- OKEY ---
+  // Usamos global.subbots para buscar una conexión existente
+  const existing = global.subbots.find(c => c.id === userName && c.connection === 'open')
   if (existing) {
     await conn.sendMessage(m.chat, { react: { text: '🤖', key: m.key } })
     return conn.reply(m.chat, '*𝘠𝘢 𝘌𝘳𝘦𝘴 𝘚𝘶𝘣-𝘣𝘰𝘵 𝘋𝘦 𝘐𝘵𝘴𝘶𝘬𝘪 🟢*', m)
@@ -85,19 +85,19 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
           sock.connection = 'open'
           sock.uptime = new Date()
 
-          // --- CAMBIO CLAVE ---
-          // Filtramos y añadimos a global.conns
-          global.conns = global.conns.filter(c => c.id !== userName)
-          global.conns.push(sock)
+          // --- VERSIÓN ORIGINAL ---
+          // Filtramos y añadimos a global.subbots
+          global.subbots = global.subbots.filter(c => c.id !== userName)
+          global.subbots.push(sock)
 
           await conn.sendMessage(m.chat, { react: { text: '✅', key: m.key } })
           await conn.reply(m.chat, '> [🌱] 𝙎𝙪𝙗-𝙗𝙤𝙩 𝘾𝙤𝙣𝙚𝙘𝙩𝙖𝙙𝙤 𝙀𝙭𝙞𝙩𝙤𝙨𝙖𝙢𝙚𝙣𝙩𝙚', m)
         }
 
         if (connection === 'close') {
-          // --- CAMBIO CLAVE ---
-          // Filtramos en global.conns al desconectar
-          global.conns = global.conns.filter(c => c.id !== userName)
+          // --- VERSIÓN ORIGINAL ---
+          // Filtramos en global.subbots al desconectar
+          global.subbots = global.subbots.filter(c => c.id !== userName)
 
           const reason = lastDisconnect?.error?.output?.statusCode || 0
 
