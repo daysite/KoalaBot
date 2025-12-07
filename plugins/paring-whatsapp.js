@@ -10,10 +10,7 @@ import chalk from 'chalk'
 // Importamos el handler principal para que los sub-bots puedan procesar mensajes
 let mainHandler
 try {
-  // ⚠️ NOTA: El handler principal se llama 'handler.js', pero aquí está importando './handler.js'.
-  // Si tu archivo de handler principal es realmente 'handler.js', la importación DEBERÍA SER:
-  // ({ handler: mainHandler } = await import('./handler.js')) 
-  // Mantendré la ruta que especificaste: './paring-verify.js'
+  // 🟢 CORRECCIÓN DE RUTA: Apuntando al handler principal (asumiendo que está en la raíz)
   ({ handler: mainHandler } = await import('./handler.js')) 
 } catch (e) {
   console.error('[SUBBOT] Error importando handler principal:', e.message || e)
@@ -66,7 +63,6 @@ export const startSubBot = async (userName, conn, m) => {
       sock.ev.on("messages.upsert", async (chatUpdate) => {
         try {
           // 'call(sock, chatUpdate)' hace que 'sock' sea la conexión actual (el sub-bot)
-          // El handler importado de './paring-verify.js' manejará los mensajes del sub-bot.
           await mainHandler.call(sock, chatUpdate) 
         } catch (e) {
           console.error(`Error en handler subbot (${userName}):`, e)
