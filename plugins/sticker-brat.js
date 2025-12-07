@@ -9,6 +9,10 @@ const execAsync = util.promisify(exec);
 
 let handler = async (m, { conn, text, args, usedPrefix, command }) => {
     //Fixieada por ZzawX
+    
+    let tempVideoPath;
+    let tempStickerPath;
+    
     try {
         await m.react('🕒');
 
@@ -28,11 +32,9 @@ let handler = async (m, { conn, text, args, usedPrefix, command }) => {
             fs.mkdirSync(tempDir, { recursive: true });
         }
 
-        const tempVideoPath = path.join(tempDir, `brat_video_${Date.now()}.mp4`);
-        const tempStickerPath = path.join(tempDir, `brat_sticker_${Date.now()}.webp`);
+        tempVideoPath = path.join(tempDir, `brat_video_${Date.now()}.mp4`);
+        tempStickerPath = path.join(tempDir, `brat_sticker_${Date.now()}.webp`);
 
-        const username = m.pushName || m.sender.split('@')[0] || "Usuario";
-        
         const mayApiUrl = `https://mayapi.ooguy.com/bratvideo`;
         
         const fallbackApiUrl = `https://api.siputzx.my.id/api/m/bratvideo?text=${encodeURIComponent(text)}`;
@@ -92,7 +94,6 @@ let handler = async (m, { conn, text, args, usedPrefix, command }) => {
             }
 
         } catch (primaryError) {
-            
             try {
                 const fallbackResponse = await axios({
                     method: 'GET',
@@ -163,9 +164,11 @@ let handler = async (m, { conn, text, args, usedPrefix, command }) => {
         }, 30000);
 
     } catch (error) {
+        console.error('Error en comando brat:', error);
+        
         try {
-            if (fs.existsSync(tempVideoPath)) fs.unlinkSync(tempVideoPath);
-            if (fs.existsSync(tempStickerPath)) fs.unlinkSync(tempStickerPath);
+            if (tempVideoPath && fs.existsSync(tempVideoPath)) fs.unlinkSync(tempVideoPath);
+            if (tempStickerPath && fs.existsSync(tempStickerPath)) fs.unlinkSync(tempStickerPath);
         } catch (cleanError) {}
         
         await m.react('❌');
