@@ -30,6 +30,8 @@ if (!fs.existsSync("./tmp")) {
   fs.mkdirSync("./tmp");
 }
 
+// ... [Resto del código de watchFile y loadPlugins] ...
+
 const CONFIG_PATH = path.join(__dirname, 'config.js')
 watchFile(CONFIG_PATH, async () => {
   try {
@@ -117,8 +119,17 @@ try {
   console.log(dbInfo)
 } catch {}
 await loadPlugins()
-let handler
-try { ({ handler } = await import('./handler.js')) } catch (e) { console.error('[Handler] Error importando handler:', e.message) }
+
+// --- 🎯 CAMBIO CLAVE 1: Importar startSubBot ---
+let handler, startSubBot
+try { 
+  const mod = await import('./handler.js');
+  handler = mod.handler;
+  startSubBot = mod.startSubBot; 
+} catch (e) { 
+  console.error('[Handler] Error importando handler o startSubBot. Asegúrate de exportarlo correctamente:', e.message); 
+}
+// --- FIN CAMBIO CLAVE 1 ---
 
 try {
   const { say } = cfonts
@@ -162,6 +173,46 @@ async function chooseMethod(authDir) {
 }
 
 const PROCESS_START_AT = Date.now()
+
+// --- 🎯 CAMBIO CLAVE 2: Nueva función para cargar Sub-Bots (CON BARRAS) ---
+const loadSubBots = async (conn) => {
+    if (!startSubBot) {
+        console.error('❌ startSubBot no está disponible. ¿El handler.js está exportando la función correctamente?')
+        return
+    }
+
+    const sessionsDir = path.join(__dirname, 'Sessions/SubBot') 
+
+    if (!fs.existsSync(sessionsDir)) {
+        console.log(chalk.gray('No se encontró el directorio Sessions/SubBot. No hay sub-bots para cargar.'))
+        return
+    }
+
+    try {
+        const subBotFolders = fs.readdirSync(sessionsDir)
+            .filter(file => fs.statSync(path.join(sessionsDir, file)).isDirectory())
+
+        if (subBotFolders.length === 0) {
+            console.log(chalk.gray('No se encontraron sesiones de sub-bots para reactivar.'))
+            return
+        }
+
+        const info = `\n╭─────────────────────────────◉\n│ ${chalk.black.bgYellowBright.bold('   🔄 INICIANDO AUTO-RECONEXIÓN   ')}\n│ 「 🤖 」${chalk.yellow(`Total de Sub-Bots: ${subBotFolders.length}`)}\n╰─────────────────────────────◉\n`
+        console.log(info)
+
+        for (const userName of subBotFolders) {
+            // Llama a startSubBot para cada sesión. Se pasa 'conn' (sock principal).
+            // Se pasa 'null' en lugar de 'm' para evitar enviar mensajes al chat al inicio.
+            console.log(chalk.cyan(`   → Reconectando sesión de: ${userName}...`))
+            startSubBot(userName, conn, null) 
+        }
+        
+    } catch (e) {
+        const errBox = `\n╭─────────────────────────────◉\n│ ${chalk.white.bgRed.bold('     ❌ ERROR AL CARGAR SUB-BOTS    ')}\n│ 「 ⚠️ 」${chalk.yellow('Error:  ')}${chalk.white(e.message || e)}\n╰─────────────────────────────◉\n`
+        console.error(errBox)
+    }
+}
+// --- FIN CAMBIO CLAVE 2 ---
 
 async function startBot() {
   const authDir = path.join(__dirname, config.sessionDirName || config.sessionName || global.sessions || 'sessions')
@@ -390,6 +441,11 @@ async function startBot() {
         const userJid = rawId ? jidNormalizedUser(rawId) : 'desconocido'
         const userName = sock?.user?.name || sock?.user?.verifiedName || 'Desconocido'
         console.log(chalk.green.bold(`[ ✅️ ]  Conectado a: ${userName}`))
+        
+        // --- 🎯 CAMBIO CLAVE 3: Iniciar la reconexión de Sub-Bots ---
+        await loadSubBots(sock)
+        // --- FIN CAMBIO CLAVE 3 ---
+
         const jid = rawId
         const num = jid.split(':')[0].replace(/[^0-9]/g,'')
         if (num && !config.botNumber && !global.botNumber) {
@@ -419,15 +475,11 @@ async function startBot() {
     }
   })
 
-  // LISTENER DE ACTUALIZACIONES DE GRUPO (SIN BIENVENIDAS)
+  // LISTENER DE ACTUALIZACIONES DE GRUPO
   sock.ev.on('group-participants.update', async (ev) => {
     try {
       const { id, participants, action } = ev || {}
       if (!id || !participants || !participants.length) return
-
-      // Aquí podrías agregar otras funcionalidades de grupo si lo deseas
-      // Pero se ha eliminado el sistema de bienvenida como solicitaste
-
     } catch (e) { 
       console.error('[GroupParticipantsUpdate]', e) 
     }
