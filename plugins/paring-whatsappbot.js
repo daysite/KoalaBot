@@ -45,7 +45,7 @@ let warn = `
 const totalUsers = users.length;
 const replyMessage = totalUsers > limit ? warn : (message || 'No hay w');
 const cap = `
-💭 \`Hello +${m.sender.split('@')[0]}! Below is the list of active subbots on Itsuki Nakano :\`
+> 💭 \`Hello +${m.sender.split('@')[0]}! Below is the list of active subbots on Itsuki Nakano :\`
 
 > 💾 Sesiones guardadas : ${await info(jadi)}
 > 🤖 Sesiones Activas : ${totalUsers || '0'}
@@ -62,14 +62,14 @@ mentionedJid: conn.parseMention(cap),
                         mediaType: 1,
                         previewType: 0,
                         renderLargerThumbnail: true,
-                        thumbnail: await (await fetch("https://files.catbox.moe/l7ce7s.jpeg")).buffer(),
+                        thumbnail: await (await fetch("https://cdn.russellxz.click/69ae53cb.jpg")).buffer(),
                         sourceUrl: ''
                     }
 }}, { quoted: m })
 }
 handler.help = ['botlist']
-handler.tags = ['jadibot']
-handler.command = ['listbot', 'listbots', 'bots', 'bebots', 'botlist'] 
+handler.tags = ['serbot']
+handler.command = ['bots'] 
 
 export default handler
 
