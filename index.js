@@ -57,7 +57,9 @@ watchFile(CONFIG_PATH, async () => {
 
 global.plugins = {}
 global.commandIndex = {}
-async function loadPluginsFunction() {
+
+// Definir loadPlugins ANTES de usarlo
+async function loadPlugins() {
   global.plugins = {}
   global.commandIndex = {}
   const PLUGIN_PATH = path.join(__dirname, 'plugins')
@@ -106,7 +108,7 @@ async function importAndIndexPlugin(fullPath) {
   } catch (e) {
     try {
       const fname = path.basename(fullPath)
-      const errBox = `\n╭─────────────────────────────◉\n│ ${chalk.white.bgRed.bold('        ❌ PLUGIN LOAD ERROR        ')}\n│ 「 🧩 」${chalk.yellow('Plugin: ')}${chalk.white(fname)}\n│ 「 ⚠️ 」${chalk.yellow('Error:  ')}${chalk.white(e.message || e)}\n╰─────────────────────────────◉\n`
+      const errBox = `\n╭─────────────────────────────◉\n│ ${chalk.white.bgRed.bold('        ❌ PLUGIN LOAD ERROR        ')}\n│ 「 🧩 」${chalk.yellow('Plugin: ')}${chalk.white(fname)}\n│「 ⚠️ 」${chalk.yellow('Error:  ')}${chalk.white(e.message || e)}\n╰─────────────────────────────◉\n`
       console.error(errBox)
     } catch {
       console.error('[PluginLoadError]', path.basename(fullPath), e.message)
@@ -216,33 +218,23 @@ async function startSubBotSession(userId, sessionPath) {
   }
 }
 
-// Cargar base de datos
-try { 
-  await loadDatabase() 
-} catch (e) { 
-  console.log('[DB] Error cargando database:', e.message) 
-}
-
+try { await loadDatabase() } catch (e) { console.log('[DB] Error cargando database:', e.message) }
 try {
   const dbInfo = `\n╭─────────────────────────────◉\n│ ${chalk.red.bgBlueBright.bold('        📦 BASE DE DATOS        ')}\n│ 「 🗃 」${chalk.yellow('Archivo: ')}${chalk.white(DB_PATH)}\n╰─────────────────────────────◉\n`
   console.log(dbInfo)
 } catch {}
 
-// Cargar plugins - CORRECCIÓN AQUÍ
+// Ahora loadPlugins está definido, podemos usarlo
 await loadPlugins()
 
-// Cargar sub-bots en segundo plano
 (async () => {
   await loadSubBots()
 })()
 
 let handler
-try { 
-  ({ handler } = await import('./handler.js')) 
+try { ({ handler } = await import('./handler.js')) 
   global.handler = handler
-} catch (e) { 
-  console.error('[Handler] Error importando handler:', e.message) 
-}
+} catch (e) { console.error('[Handler] Error importando handler:', e.message) }
 
 try {
   const { say } = cfonts
@@ -254,10 +246,7 @@ try {
   try { serialize() } catch {}
   const packageJsonPath = path.join(__dirname, 'package.json')
   let packageJsonObj = {}
-  try { 
-    const rawPkg = await fs.promises.readFile(packageJsonPath, 'utf8'); 
-    packageJsonObj = JSON.parse(rawPkg) 
-  } catch {}
+  try { const rawPkg = await fs.promises.readFile(packageJsonPath, 'utf8'); packageJsonObj = JSON.parse(rawPkg) } catch {}
   const ramInGB = os.totalmem() / (1024 * 1024 * 1024)
   const freeRamInGB = os.freemem() / (1024 * 1024 * 1024)
   const currentTime = new Date().toLocaleString()
