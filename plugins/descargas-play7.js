@@ -25,7 +25,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (command === 'play11') {
       try {
         const result = await fetch(`https://api.download-lagu-mp3.com/@api/button/video/${video.videoId}`).then(r => r.json())
-        if (!result?.url) throw new Error('API sin resultado válido')
+        if (!result?.url) throw new Error('API 1 falló')
 
         await conn.sendMessage(m.chat, {
           video: { url: result.url },
@@ -35,7 +35,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
         await m.react('✅')
       } catch (err) {
-        await m.react('❌')
         try {
           const altResult = await fetch(`https://api.nekolabs.fun/api/ytdl?url=${video.url}`).then(r => r.json())
           if (altResult?.videoUrl) {
@@ -46,10 +45,25 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             }, { quoted: m })
             await m.react('✅')
           } else {
-            throw new Error('APIs fallaron')
+            throw new Error('API 2 falló')
           }
         } catch (e) {
-          conn.reply(m.chat, '> ⓘ \`Error al descargar el video\`', m)
+          try {
+            const response = await fetch(`https://ytdl-h4ck.vercel.app/ytmp4?url=${video.url}`).then(r => r.json())
+            if (response?.videoUrl) {
+              await conn.sendMessage(m.chat, {
+                video: { url: response.videoUrl },
+                caption: `> ⓘ \`Video:\` *${video.title}*`,
+                fileName: `${video.title}.mp4`
+              }, { quoted: m })
+              await m.react('✅')
+            } else {
+              throw new Error('API 3 falló')
+            }
+          } catch (error) {
+            await m.react('❌')
+            conn.reply(m.chat, '> ⓘ \`Error al descargar el video\`', m)
+          }
         }
       }
 
