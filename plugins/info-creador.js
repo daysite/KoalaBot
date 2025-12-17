@@ -12,22 +12,22 @@ let handler = async (m, { conn }) => {
       {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({ 
-          display_text: '𝙄𝙣𝙨𝙩𝙖𝙜𝙧𝙖𝙢 📸', 
-          url: 'https://www.instagram.com/naayz01s' 
+          display_text: 'Instagram 📸', 
+          url: 'https://www.instagram.com/Danixffx' 
         })
       },
       {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({ 
-          display_text: '𝙊𝙬𝙣𝙚𝙧 👑', 
-          url: 'https://wa.me/573187418668' 
+          display_text: 'Owner 👑', 
+          url: 'https://wa.me/51994154761' 
         })
       },
       {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({ 
-          display_text: '𝘿𝙤𝙣𝙖𝙘𝙞𝙤𝙣𝙘𝙞𝙩𝙖 ❤️‍🩹', 
-          url: 'https://paypal.me/Erenxs01' 
+          display_text: 'Grupo ❤️‍🩹', 
+          url: 'https://paypal.me/https://chat.whatsapp.com/B5qa7Gkt00F46fejTWifSB?mode=hqrc' 
         })
       }
     ]
