@@ -41,7 +41,7 @@ let handler = async (m, { conn }) => {
     const uptimeString = `${hours}h ${minutes}m ${seconds}s`
 
     // Mensaje del ping
-    const pingMessage = `> *ⓘ I T S U K I - P I N G* 
+    const pingMessage = `> *ⓘ S 3 X B O T - P I N G* 
 
 > *\`Ping :\` ${ping} ms*
 > *\`Velocidad :\` ${speed}*
