@@ -32,7 +32,7 @@ let handler = async (m, { conn, args }) => {
     const isUpToDate = lower.includes('already up to date') || lower.includes('up to date')
     let response
     if (isUpToDate) {
-      response = `> ⓘ *¡Itsuki ya está actualizada!*\n\n> ⓘ *El bot está al día con las últimas mejoras*`
+      response = `> ⓘ *¡Bot ya está actualizada!*\n\n> ⓘ *El bot está al día con las últimas mejoras*`
       await m.react('✅')
     } else {
       const changed = []
