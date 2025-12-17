@@ -13,7 +13,7 @@ global.__dirname = (url) => dirname(fileURLToPath(url));
 
 //aquí los retirados👑🥀
 global.retirado = [
-['5216641784469','BrayanOFC',true]
+['51994143761','BrayanOFC',true]
 ];
 
 /*habrán comandos especiales para los retirados algo q los identifique | nota ustedes pondrán los coamndos y q solo funcione para los retirados*/
