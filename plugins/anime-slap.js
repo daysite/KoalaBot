@@ -4,11 +4,19 @@ import path from 'path';
 let handler = async (m, { conn, usedPrefix }) => {
     let who;
 
-    if (m.mentionedJid.length > 0) {
-        who = m.mentionedJid[0];
-    } else if (m.quoted) {
+    // Obtener todas las menciones del mensaje
+    const mentionedJids = m.mentionedJid || [];
+    
+    // Si hay menciones explícitas en el mensaje
+    if (mentionedJids.length > 0) {
+        who = mentionedJids[0];
+    } 
+    // Si hay un mensaje citado
+    else if (m.quoted) {
         who = m.quoted.sender;
-    } else {
+    } 
+    // Por defecto, el remitente
+    else {
         who = m.sender;
     }
 
@@ -16,10 +24,10 @@ let handler = async (m, { conn, usedPrefix }) => {
     let name2 = conn.getName(m.sender);
 
     let str;
-    if (m.mentionedJid.length > 0) {
+    if (mentionedJids.length > 0) {
         str = `\`${name2}\` *golpeó a* \`${name || who}\`.`;
     } else if (m.quoted) {
-        str = `\`${name2}\` *golpeó a*  \`${name || who}\`.`;
+        str = `\`${name2}\` *golpeó a* \`${name || who}\`.`;
     } else {
         str = `\`${name2}\` *se golpeó a sí mismo*.`.trim();
     }
@@ -39,7 +47,12 @@ let handler = async (m, { conn, usedPrefix }) => {
         const video = videos[Math.floor(Math.random() * videos.length)];
 
         let mentions = [who];
-        conn.sendMessage(m.chat, { video: { url: video }, gifPlayback: true, caption: str, mentions }, { quoted: m });
+        await conn.sendMessage(m.chat, { 
+            video: { url: video }, 
+            gifPlayback: true, 
+            caption: str, 
+            mentions: mentions 
+        }, { quoted: m });
     }
 }
 
