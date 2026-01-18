@@ -70,15 +70,15 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
       {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({ 
-          display_text: '☃️ GRUPO OFC', 
-          url: 'https://chat.whatsapp.com/B5qa7Gkt00F46fejTWifSB?mode=hqrc' 
+          display_text: 'DUEÑO DEL BOT', 
+          url: 'https://wa.link/qjn865' 
         })
       },
       {
         name: 'cta_url',
         buttonParamsJson: JSON.stringify({ 
-          display_text: '💻 PAGINA DEL CREADOR', 
-          url: 'https://es.pornhub.com/' 
+          display_text: 'INSTAGRAM DEL CLAN', 
+          url: 'https://www.instagram.com/top.koalas?igsh=MWkzZm1nY2k4ZzFwNw==' 
         })
       }
     ]
