@@ -17,11 +17,11 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
     let neww = performance.now()
     let speed = (neww - old).toFixed(4)
 
-    let menuText = `> 👋🏻 .ৎ˚₊‧  *Hola*, +${m.sender.split('@')[0]} *Pasa Feliz Navidad ❄️*.
+    let menuText = `> 👋🏻 .ৎ˚₊‧  *Hola*, +${m.sender.split('@')[0]} *Pasa Feliz Año Nuevo*.
 
  ִ \`I N F O - B O T\` ! ୧ ֹ 
    
-> ੭੭﹙❐﹚ \`bot :\` *S3X LEGAL BOT*
+> ੭੭﹙❐﹚ \`bot :\` *TOP KOALA BOT*
 > ੭੭﹙❐﹚ \`Ping :\` *${speed} ms*
 > ੭੭﹙❐﹚ \`Uptime :\` *${await getUptime()}*
 > ੭੭﹙❐﹚ \`RAM :\` *${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)}* MB
