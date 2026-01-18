@@ -33,17 +33,17 @@ global.nombre = m.pushName || 'User-MD'
 global.packsticker = ``
 
 global.iconos = [
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg',
-  'https://files.catbox.moe/wl6zd2.jpg'
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg',
+  'https://files.catbox.moe/q52qmt.jpeg'
 ]
 global.icono = global.iconos[Math.floor(Math.random() * global.iconos.length)]
 
