@@ -13,9 +13,9 @@ global.canalIdM = [
 ]
 
 global.canalNombreM = [
-  "꒰ ❄️ S3X LEGAL BOT BY DANIEL ꒱", 
-  "SEX LEGAL BOT LIDER PEDRO",
-  "PEDRO X FABRI",
+  "꒰ ❄️ TOP KOALA BOT BY DANIEL ꒱", 
+  "TOP KOALA",
+  "BOT",
   "OLA"
 ]
 
@@ -51,10 +51,10 @@ global.wm = '© Danizffx'
 global.wm3 = '⫹⫺ Multi devicw 💻'
 global.author = '👑 MADE BY DANIEL 🧃'
 global.dev = '© OWNER DANIEL 👑'
-global.textbot = 'S3X LEGAL BOT|Danizffx'
+global.textbot = 'TOP KOALA BOT|Danizffx'
 global.etiqueta = '@Danizffx'
 global.gt = '© Creado por daniel'
-global.me = '🌨️ Pedro kabro ☃️'
+global.me = '🌨️ BOT ☃️'
 
 global.fkontak = { 
   key: { 
